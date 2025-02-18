@@ -30,3 +30,13 @@ def compute_silhouette_score(X, labels):
         silhouette_scores.append(s_i)
     return np.mean(silhouette_scores)
 
+import pandas as pd
+import sys
+
+def fetchDataset(filename):
+    data = pd.read_csv(filename)
+    if data is None:
+        print("Error reading file")
+        sys.exit(1)
+    included_columns = data.columns.where(data.columns != '0').dropna()
+    return data[included_columns]
