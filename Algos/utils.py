@@ -1,4 +1,6 @@
 import numpy as np
+import pandas as pd
+import sys
 
 def euclidean_distance(p1, p2):
     return np.sqrt(np.sum((p1 - p2) ** 2))
@@ -30,8 +32,7 @@ def compute_silhouette_score(X, labels):
         silhouette_scores.append(s_i)
     return np.mean(silhouette_scores)
 
-import pandas as pd
-import sys
+
 
 def fetchDataset(filename):
     data = pd.read_csv(filename)
