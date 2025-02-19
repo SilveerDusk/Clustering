@@ -1,6 +1,9 @@
 import sys
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
+from scipy.cluster.hierarchy import dendrogram, linkage
+
 
 def main():
     if len(sys.argv) < 2 or len(sys.argv) > 3:
@@ -9,21 +12,47 @@ def main():
 
     datafile = sys.argv[1]
     if len(sys.argv) == 3:
-        threshold = sys.argv[2]
-
+        threshold = float(sys.argv[2])
+    else:
+        threshold = None
     df = pd.read_csv(datafile)
-    
+    df = df.select_dtypes(include=["number"])
     clusters = initialize_clusters(df)
+    merge_history = []
+    cluster_indices = list(range(len(clusters))) 
+
     while len(clusters) > 1:
-        dist_matrix = compute_distances(clusters, linkage_type="centroid")
+        dist_matrix = compute_distances(clusters, linkage_type="complete")
         i, j = find_closest_clusters(distance_matrix=dist_matrix)
+
+        # get merge distance
+        merge_distance = dist_matrix[i, j]
+        new_cluster_size = len(clusters[i]) + len(clusters[j])
+
+        # Currently doesn't work right now with threshold
+        # if threshold is not None and merge_distance > threshold:
+        #     break
+
+        # Add to merge history for plotting
+        merge_history.append([cluster_indices[i], cluster_indices[j], merge_distance, new_cluster_size])
+
+        # Merge clusters
         merge_clusters(clusters=clusters, i=i, j=j)
-    return clusters[0]
+
+        # Assign new index for the merged cluster
+        new_cluster_id = len(df) + len(merge_history) - 1
+        cluster_indices[i] = new_cluster_id 
+        del cluster_indices[j]
+
+    merge_history = np.array(merge_history)
+    plot_dendrogram(merge_history, df.shape[0])
+
 
 
 def initialize_clusters(df):
-    clusters = [tuple(row) for row in df.values] 
+    clusters = [np.array([row]) for row in df.values]
     return clusters
+
 
 def compute_distances(clusters, linkage_type):
     num_clusters = len(clusters)
@@ -68,13 +97,24 @@ def find_closest_clusters(distance_matrix):
     return closest_clusters
 
 def merge_clusters(clusters, i, j):
-    new_cluster = tuple(set(clusters[i]) | set(clusters[j]))
+    new_cluster = np.vstack((clusters[i], clusters[j]))  
     clusters[i] = new_cluster
-    del clusters[j]
-    clusters.insert(min(i, j), new_cluster)
+    del clusters[j] 
 
 
+def plot_dendrogram(merge_history, num_points):
+    linkage_matrix = np.array(merge_history)
+    
+    if linkage_matrix.shape[0] != num_points - 1 or linkage_matrix.shape[1] != 4:
+        raise ValueError(f"Invalid linkage matrix shape: {linkage_matrix.shape}. Expected ({num_points - 1}, 4).")
 
+    plt.figure(figsize=(10, 6))
+
+    dendrogram(linkage_matrix, labels=np.arange(num_points))
+    plt.title("Hierarchical Clustering Dendrogram")
+    plt.xlabel("Data Points")
+    plt.ylabel("Distance")
+    plt.show()
 
 if __name__ == "__main__":
     main()
