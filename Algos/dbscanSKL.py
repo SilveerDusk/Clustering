@@ -26,15 +26,13 @@ def main():
     print(silhouette)
 
     fig = px.scatter(
-       df,
-       #Currently just shows uses the first two numeric as X and Y
-       x = num_df.columns[0],
-       y = num_df.columns[1],
-       color = "clusterStr",
-       title = f"DBSCAN using Epsilon: {epsilon}, Min Samples: {numPoints}, Silhouette Score: {silhouette}",
-       labels={"clusterStr": "Cluster"},
-       opacity=0.8,
-       hover_data=df.columns
+        df,
+        dimensions=num_df.columns, 
+        color = "clusterStr",
+        title = f"DBSCAN using Epsilon: {epsilon}, Min Samples: {numPoints}, Silhouette Score: {silhouette}",
+        labels={"clusterStr": "Cluster"},
+        opacity=0.8,
+        hover_data=df.columns
     )
     fig.show()
 

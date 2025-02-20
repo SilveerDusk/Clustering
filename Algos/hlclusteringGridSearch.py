@@ -19,7 +19,7 @@ def hlclustering_and_evaluate(df, n_clusters=None, threshold=None):
     df["cluster"] = model.fit_predict(num_df)
     
     if len(set(df["cluster"])) < 2:
-        return -1, None  # Invalid clustering
+        return -1, None  
 
     silhouette = utils.compute_silhouette_score(num_df, df["cluster"])
 
@@ -29,7 +29,6 @@ def generate_dendrogram(df, filename="dendrogram.png"):
     """Generates and saves the dendrogram of the hierarchical clustering."""
     num_df = df.select_dtypes(include=["number"])
     
-    # Compute the linkage matrix using scipy's linkage function
     linkage_matrix = sch.linkage(num_df, method="single", metric="euclidean")
     
     plt.figure(figsize=(12, 6))
@@ -38,7 +37,6 @@ def generate_dendrogram(df, filename="dendrogram.png"):
     plt.xlabel("Data Points")
     plt.ylabel("Distance")
     
-    # Save the dendrogram as a file
     plt.savefig(filename)
     plt.close()
     print(f"Dendrogram saved as {filename}")
@@ -55,7 +53,7 @@ def grid_search(datafile, thresholds, n_clusters):
             silhouette, clustered_df = hlclustering_and_evaluate(df.copy(), num_clusters, threshold)
             if clustered_df is not None:
                 num_clusters_found = clustered_df["cluster"].nunique()
-
+                
                 if silhouette > best_score and silhouette != 1.0 and num_clusters == num_clusters_found:
                     best_score = silhouette
                     best_params = (threshold, num_clusters)
@@ -68,11 +66,12 @@ def grid_search(datafile, thresholds, n_clusters):
     if best_df is not None:
         generate_dendrogram(best_df)
         best_df["clusterStr"] = best_df["cluster"].astype(str)
-        fig = px.scatter(
+        best_num_df = best_df.select_dtypes(include=["number"])
+
+        fig = px.scatter_matrix(
             best_df,
-            x=best_df.select_dtypes(include=["number"]).columns[0],
-            y=best_df.select_dtypes(include=["number"]).columns[1],
-            color="clusterStr",
+            dimensions=best_num_df.columns[:(len(best_num_df.columns)-1)], 
+            color = "clusterStr",
             title=f"Best HL Clustering for data: {datafile}, Threshold={best_params[0]}, n_clusters: {best_params[1]}, Score={best_score:.4f}",
             labels={"clusterStr": "Cluster"},
             opacity=0.8,
@@ -88,7 +87,7 @@ if __name__ == "__main__":
     datafile = sys.argv[1]
 
     thresholds = np.arange(4, 15, 0.5).tolist()
-    n_clusters = list(range(2, 10))
+    n_clusters = list(range(3, 5))
     print(n_clusters)
 
     grid_search(datafile,thresholds=thresholds, n_clusters= n_clusters)

@@ -16,24 +16,23 @@ def main():
     df = pd.read_csv(datafile)
     num_df = df.select_dtypes(include=["number"])
 
-    model = KMeans(n_clusters=k).fit(df)
-    df["cluster"] = model.predict(df)
+
+    model = KMeans(n_clusters=k).fit(num_df)
+    df["cluster"] = model.predict(num_df)
 
     df["clusterStr"] = df["cluster"].astype(str)
     silhouette = utils.compute_silhouette_score(num_df, df["cluster"])
     print(silhouette)
 
-    fig = px.scatter(
-       df,
-       #Currently just shows uses the first two numeric as X and Y
-       x = num_df.columns[0],
-       y = num_df.columns[1],
-       color = "clusterStr",
-       title = f"Agglomerative Clustering using data: {datafile}, k: {k}, Silhouette Score: {silhouette}",
-       labels={"clusterStr": "Cluster"},
-       opacity=0.8,
-       hover_data=df.columns
+    fig = px.scatter_matrix(
+        df,
+        dimensions=num_df.columns,  # Use only numerical columns for the matrix
+        color="clusterStr",
+        title=f"K-Means Clustering (k={k}), Silhouette Score: {silhouette}",
+        labels={"clusterStr": "Cluster"},
+        opacity=0.8
     )
+
     fig.show()
 
 
