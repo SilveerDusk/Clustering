@@ -18,16 +18,6 @@ MAX_CH = 2500
 def normalize(value, min_val, max_val):
     return (value - min_val) / (max_val - min_val) if max_val > min_val else 0
 
-MIN_SIL = 0.0  
-MAX_SIL = 1.0
-
-MIN_CH = 500 
-MAX_CH = 2500  
-
-def normalize(value, min_val, max_val):
-    return (value - min_val) / (max_val - min_val) if max_val > min_val else 0
-
-
 def kmeans_and_evaluate(df, k):
     num_df = df.select_dtypes(include=["number"])
 
