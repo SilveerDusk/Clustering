@@ -4,6 +4,7 @@ import pandas as pd
 import plotly.express as px
 import utils
 import numpy as np
+from kmeans import kmeans
 
 
 
@@ -25,14 +26,14 @@ def kmeans_and_evaluate(df, k):
 
 
 def grid_search(datafile, kvalues):
-    df = pd.read_csv(datafile)
+    df = utils.fetchDataset(datafile)
     best_score = float("-inf")
     best_params = None
     best_df = None
 
     for k in kvalues:
     
-        silhouette, clustered_df = kmeans_and_evaluate(df.copy(), k)
+        silhouette, clustered_df = kmeans(df.copy(), k)
 
         if silhouette > best_score:
             best_score = silhouette

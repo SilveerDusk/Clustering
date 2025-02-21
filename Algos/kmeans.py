@@ -4,6 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from itertools import combinations
 from utils import fetchDataset
+from utils import compute_silhouette_score
 
 def euclidean_distance(x1, x2):
   return np.sqrt(np.sum((x1 - x2) ** 2))
@@ -86,18 +87,7 @@ def plot_clusters(X, clusters, centroids):
   plt.tight_layout()
   plt.show()
 
-def main():
-  if len(sys.argv) != 3:
-    print("Usage: python3 kmeans <Filename> <k>")
-    sys.exit(1)
-
-  datafile = sys.argv[1]
-  k = sys.argv[2]
-
-  X = fetchDataset(datafile)
-  X = X.astype(float)
-  k = int(k)
-
+def kmeans(X, k):
   centroids = initialize_centroids(X, k)
   clusters = form_clusters(X, centroids, k, euclidean_distance)
   new_centroids = calculate_new_centroids(X, clusters)
@@ -120,7 +110,31 @@ def main():
 
   final_clusters = form_clusters(X, new_centroids, k, euclidean_distance)
   print("Final Clusters:\n", final_clusters)
-  plot_clusters(X, final_clusters, new_centroids)
+
+  labels = np.zeros(X.shape[0])
+
+  for i, cluster in enumerate(final_clusters):
+    for sample_i in cluster:
+      labels[sample_i] = i
+
+  silhouette = compute_silhouette_score(X.to_numpy(), np.array(labels))
+  X["cluster"] = labels
+
+  return silhouette, X 
+
+def main():
+  if len(sys.argv) != 3:
+    print("Usage: python3 kmeans <Filename> <k>")
+    sys.exit(1)
+
+  datafile = sys.argv[1]
+  k = sys.argv[2]
+
+  X = fetchDataset(datafile)
+  X = X.astype(float)
+  k = int(k)
+
+  kmeans(X, k)
 
 
 if __name__ == "__main__":

@@ -45,12 +45,13 @@ def grid_search(datafile, epsilons, min_samples):
     
     if best_df is not None:
         best_df["clusterStr"] = best_df["cluster"].astype(str)
-        fig = px.scatter(
+        best_num_df = best_df.select_dtypes(include=["number"])
+        print(best_num_df.columns)
+        fig = px.scatter_matrix(
             best_df,
-            x=best_df.select_dtypes(include=["number"]).columns[0],
-            y=best_df.select_dtypes(include=["number"]).columns[1],
-            color="clusterStr",
-            title=f"Best DBSCAN: Eps={best_params[0]}, MinPts={best_params[1]}, Score={best_score:.4f}",
+            dimensions=best_num_df.columns[:(len(best_num_df.columns)-1)], 
+            color = "clusterStr",
+            title = f"DBSCAN using Epsilon: {epsilon}, Min Samples: {numPoints}, Silhouette Score: {best_score}",
             labels={"clusterStr": "Cluster"},
             opacity=0.8,
             hover_data=best_df.columns
