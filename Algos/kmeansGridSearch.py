@@ -18,16 +18,13 @@ MAX_CH = 2500
 def normalize(value, min_val, max_val):
     return (value - min_val) / (max_val - min_val) if max_val > min_val else 0
 
-# Min and Max values for normalization (Update these based on data range)
-MIN_SIL = 0.0  # Silhouette scores range from -1 to 1, but we usually consider [0,1]
+MIN_SIL = 0.0  
 MAX_SIL = 1.0
 
-MIN_CH = 500  # Minimum CHScore observed (adjust if needed)
-MAX_CH = 2500  # Maximum CHScore observed (adjust if needed)
-
+MIN_CH = 500 
+MAX_CH = 2500  
 
 def normalize(value, min_val, max_val):
-    """Apply Min-Max normalization to scale values between 0 and 1."""
     return (value - min_val) / (max_val - min_val) if max_val > min_val else 0
 
 
