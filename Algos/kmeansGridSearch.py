@@ -8,30 +8,11 @@ import numpy as np
 from kmeans import kmeans
 
 
-# Min and Max values for normalization (Update these based on data range)
-MIN_SIL = 0.0  # Silhouette scores range from -1 to 1, but we usually consider [0,1]
+MIN_SIL = 0.0
 MAX_SIL = 1.0
 
-MIN_CH = 500  # Minimum CHScore observed (adjust if needed)
-MAX_CH = 2500  # Maximum CHScore observed (adjust if needed)
-
-
-def normalize(value, min_val, max_val):
-    """Apply Min-Max normalization to scale values between 0 and 1."""
-    return (value - min_val) / (max_val - min_val) if max_val > min_val else 0
-
-# Min and Max values for normalization (Update these based on data range)
-MIN_SIL = 0.0  # Silhouette scores range from -1 to 1, but we usually consider [0,1]
-MAX_SIL = 1.0
-
-MIN_CH = 500  # Minimum CHScore observed (adjust if needed)
-MAX_CH = 2500  # Maximum CHScore observed (adjust if needed)
-
-
-def normalize(value, min_val, max_val):
-    """Apply Min-Max normalization to scale values between 0 and 1."""
-    return (value - min_val) / (max_val - min_val) if max_val > min_val else 0
-
+MIN_CH = 500
+MAX_CH = 2500
 
 def kmeans_and_evaluate(df, k):
     num_df = df.select_dtypes(include=["number"])
@@ -44,14 +25,14 @@ def kmeans_and_evaluate(df, k):
     if len(set(df["cluster"])) < 2:
         return -1, None  # Invalid clustering
 
-    silhouette = utils.compute_silhouette_score(num_df, df["cluster"])
+    silhouette = utils.compute_silhouette_score(num_df.to_numpy(), df["cluster"].to_numpy())
     CHScore = calinski_harabasz_score(num_df, df["cluster"])
 
 
 
     # Normalize both metrics
-    silhouette_norm = normalize(silhouette, MIN_SIL, MAX_SIL)
-    CHScore_norm = normalize(CHScore, MIN_CH, MAX_CH)
+    silhouette_norm = utils.normalize(silhouette, MIN_SIL, MAX_SIL)
+    CHScore_norm = utils.normalize(CHScore, MIN_CH, MAX_CH)
 
     # Compute the balanced avgScore
     avgScore = (silhouette_norm + CHScore_norm) / 2
@@ -69,7 +50,7 @@ def grid_search(datafile, kvalues):
 
     for k in kvalues:
     
-        avgScore, silhouette, CHScore, clustered_df = kmeans_and_evaluate(df.copy(), k)
+        avgScore, silhouette, CHScore, clustered_df = kmeans(df.copy(), k)
 
         if avgScore > best_score:
             best_score = avgScore

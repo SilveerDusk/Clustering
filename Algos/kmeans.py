@@ -4,7 +4,14 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from itertools import combinations
 from utils import fetchDataset
-from utils import compute_silhouette_score
+from utils import compute_silhouette_score, normalize
+from sklearn.metrics import calinski_harabasz_score
+
+MIN_SIL = 0.0
+MAX_SIL = 1.0
+
+MIN_CH = 500
+MAX_CH = 2500
 
 
 def euclidean_distance(x1, x2):
@@ -118,10 +125,17 @@ def kmeans(X, k):
     for sample_i in cluster:
       labels[sample_i] = i
 
-  silhouette = compute_silhouette_score(X.to_numpy(), np.array(labels))
   X["cluster"] = labels
+  silhouette = compute_silhouette_score(X.to_numpy(), X["cluster"].to_numpy())
+  CHScore = calinski_harabasz_score(X, X["cluster"])
 
-  return silhouette, X 
+  # Normalize both metrics
+  silhouette_norm = normalize(silhouette, MIN_SIL, MAX_SIL)
+  CHScore_norm = normalize(CHScore, MIN_CH, MAX_CH)
+
+  # Compute the balanced avgScore
+  avgScore = (silhouette_norm + CHScore_norm) / 2
+  return avgScore, silhouette, CHScore, X
 
 def main():
   if len(sys.argv) != 3:

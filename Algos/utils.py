@@ -5,6 +5,10 @@ import sys
 def euclidean_distance(p1, p2):
     return np.sqrt(np.sum((p1 - p2) ** 2))
 
+def normalize(value, min_val, max_val):
+    """Apply Min-Max normalization to scale values between 0 and 1."""
+    return (value - min_val) / (max_val - min_val) if max_val > min_val else 0
+
 def compute_silhouette_score(X, labels):
     unique_clusters = np.unique(labels)
     silhouette_scores = []
