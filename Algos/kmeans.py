@@ -65,8 +65,10 @@ def plot_clusters(X, clusters, centroids):
   grid_size = int(np.ceil(np.sqrt(n_pairs)))
   
   fig, axes = plt.subplots(grid_size, grid_size, figsize=(15, 15))
-  axes = axes.flatten()  # Flatten the 2D array of axes to 1D for easy iteration
-  
+  if grid_size == 1:
+    axes = np.array([axes])
+  else:
+    axes = axes.flatten()  
   for ax, (i, j) in zip(axes, feature_pairs):
       for cluster_i, cluster in enumerate(clusters):
           for sample_i in cluster:
