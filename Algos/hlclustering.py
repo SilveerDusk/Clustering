@@ -30,8 +30,8 @@ def main():
         new_cluster_size = len(clusters[i]) + len(clusters[j])
 
         # Currently doesn't work right now with threshold
-        # if threshold is not None and merge_distance > threshold:
-        #     break
+        if threshold is not None and merge_distance > threshold:
+            break
 
         # Add to merge history for plotting
         merge_history.append([cluster_indices[i], cluster_indices[j], merge_distance, new_cluster_size])
@@ -45,8 +45,9 @@ def main():
         del cluster_indices[j]
 
     merge_history = np.array(merge_history)
-    plot_dendrogram(merge_history, df.shape[0])
-
+    #plot_dendrogram(merge_history, df.shape[0])
+    print(clusters)
+    return clusters
 
 
 def initialize_clusters(df):
