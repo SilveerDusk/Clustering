@@ -28,16 +28,14 @@ def main():
     silhouette = utils.compute_silhouette_score(num_df, df["cluster"])
     print(silhouette)
 
-    fig = px.scatter(
-       df,
-       #Currently just shows uses the first two numeric as X and Y
-       x = num_df.columns[0],
-       y = num_df.columns[1],
-       color = "clusterStr",
-       title = f"Agglomerative Clustering using data: {datafile}, threshold {threshold}, Silhouette Score: {silhouette}",
-       labels={"clusterStr": "Cluster"},
-       opacity=0.8,
-       hover_data=df.columns
+    fig = px.scatter_matrix(
+        df,
+        dimensions=num_df.columns, 
+        color = "clusterStr",
+        title = f"Agglomerative Clustering using data: {datafile}, threshold {threshold}, Silhouette Score: {silhouette}",
+        labels={"clusterStr": "Cluster"},
+        opacity=0.8,
+        hover_data=df.columns
     )
     fig.show()
 
