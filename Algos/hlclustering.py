@@ -3,6 +3,8 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from scipy.cluster.hierarchy import dendrogram, linkage
+import copy
+from pprint import pprint
 
 
 def main():
@@ -19,7 +21,9 @@ def main():
     df = df.select_dtypes(include=["number"])
     clusters = initialize_clusters(df)
     merge_history = []
-    cluster_indices = list(range(len(clusters))) 
+    cluster_indices = list(range(len(clusters)))
+    threshold_clusters = None  # Store clusters when threshold is hit
+ 
 
     while len(clusters) > 1:
         dist_matrix = compute_distances(clusters, linkage_type="complete")
@@ -30,8 +34,8 @@ def main():
         new_cluster_size = len(clusters[i]) + len(clusters[j])
 
         # Currently doesn't work right now with threshold
-        if threshold is not None and merge_distance > threshold:
-            break
+        if threshold is not None and merge_distance > threshold and threshold_clusters is None:
+            threshold_clusters = copy.deepcopy(clusters)
 
         # Add to merge history for plotting
         merge_history.append([cluster_indices[i], cluster_indices[j], merge_distance, new_cluster_size])
@@ -45,9 +49,10 @@ def main():
         del cluster_indices[j]
 
     merge_history = np.array(merge_history)
-    #plot_dendrogram(merge_history, df.shape[0])
-    print(clusters)
-    return clusters
+    plot_dendrogram(merge_history, df.shape[0])
+    final_clusters = threshold_clusters if threshold_clusters is not None else clusters
+    pprint(final_clusters, width=100)
+    return final_clusters
 
 
 def initialize_clusters(df):
@@ -115,7 +120,8 @@ def plot_dendrogram(merge_history, num_points):
     plt.title("Hierarchical Clustering Dendrogram")
     plt.xlabel("Data Points")
     plt.ylabel("Distance")
-    plt.show()
+    plt.savefig("dendrogramScratch.png")
+
 
 if __name__ == "__main__":
     main()
