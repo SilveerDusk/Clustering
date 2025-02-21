@@ -6,8 +6,6 @@ def euclidean_distance(p1, p2):
     return np.sqrt(np.sum((p1 - p2) ** 2))
 
 def compute_silhouette_score(X, labels):
-    labels = labels.to_numpy()
-    X = X.to_numpy()
     unique_clusters = np.unique(labels)
     silhouette_scores = []
 

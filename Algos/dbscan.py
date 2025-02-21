@@ -1,9 +1,10 @@
 import sys
 from utils import fetchDataset
-
+import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from itertools import combinations
+from utils import compute_silhouette_score
 
 def plot_circles(X, eps):
     for point in X:
@@ -53,8 +54,11 @@ def dbscan(X, eps, min_pts):
             labels = expand_cluster(X, labels, point_idx, neighbors, cluster_id, eps, min_pts)
         else:
             labels[point_idx] = -1  # Noise
-    
-    return labels
+
+    silhouette = compute_silhouette_score(X.to_numpy(), np.array(labels))
+    X["cluster"] = labels
+
+    return silhouette, X
 
 def main():
     if len(sys.argv) != 4:

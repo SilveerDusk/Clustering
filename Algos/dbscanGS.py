@@ -4,6 +4,8 @@ import pandas as pd
 import plotly.express as px
 import utils
 import numpy as np
+from dbscan import dbscan
+from utils import fetchDataset
 
 
 
@@ -16,21 +18,21 @@ def dbscan_and_evaluate(df, epsilon, numPoints):
     if len(set(df["cluster"])) < 2:
         return -1, None  # Invalid clustering
 
-    silhouette = utils.compute_silhouette_score(num_df.to_numpy(), df["cluster"].to_numpy())
+    silhouette = utils.compute_silhouette_score(num_df, df["cluster"])
     
     return silhouette, df
 
 
 
 def grid_search(datafile, epsilons, min_samples):
-    df = pd.read_csv(datafile)
+    df = fetchDataset(datafile)
     best_score = float("-inf")
     best_params = None
     best_df = None
 
     for epsilon in epsilons:
         for numPoints in min_samples:
-            silhouette, clustered_df = dbscan_and_evaluate(df.copy(), epsilon, numPoints)
+            silhouette, clustered_df = dbscan(df.copy(), epsilon, numPoints)
 
             if silhouette > best_score:
                 best_score = silhouette
