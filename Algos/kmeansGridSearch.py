@@ -22,22 +22,13 @@ def kmeans_and_evaluate(df, k):
     df["cluster"] = model.predict(num_df)
 
     if len(set(df["cluster"])) < 2:
-        return -1, None  
+        return None  
 
-    silhouette = utils.compute_silhouette_score(num_df.to_numpy(), df["cluster"].to_numpy())
-    CHScore = calinski_harabasz_score(num_df, df["cluster"])
-
-
-
-    silhouette_norm = utils.normalize(silhouette, MIN_SIL, MAX_SIL)
-    CHScore_norm = utils.normalize(CHScore, MIN_CH, MAX_CH)
-
-    avgScore = (silhouette_norm + CHScore_norm) / 2
-    return avgScore, silhouette, CHScore, df
+    return df
 
 
 
-def grid_search(datafile, kvalues):
+def grid_search(datafile, kvalues, method):
     df = utils.fetchDataset(datafile)
     best_score = float("-inf")
     best_params = None
@@ -46,22 +37,29 @@ def grid_search(datafile, kvalues):
     best_df = None
 
     for k in kvalues:
-    
-        avgScore, silhouette, CHScore, clustered_df = kmeans(df.copy(), k)
+        if method == "Scratch":
+            clustered_df = kmeans(df.copy(), k)
+        elif method == "SKL":
+            clustered_df = kmeans_and_evaluate(df.copy(), k)
+        if clustered_df is not None:
 
-        if avgScore > best_score:
-            best_score = avgScore
-            best_silhouette = silhouette
-            best_CH = CHScore
-            best_params = k
-            best_df = clustered_df
+            silhouette, CHScore, Rand = utils.compute_cluster_statistics(clustered_df, printIt=False)
 
-        print(f"K: {k}, avgScore: {avgScore:.4f}, Silhouette: {silhouette:.4f}, CH Score: {CHScore:.4f}")
+            if silhouette > best_score:
+                best_score = silhouette
+                best_silhouette = silhouette
+                best_CH = CHScore
+                best_params = k
+                best_df = clustered_df
 
-    print(f"\nBest Params: K={best_params} with avg Score={best_score:.4f}, Silhouette={best_silhouette:.4f}, CHScore={best_CH:.4f} ")
+            print(f"K: {k}, Silhouette: {silhouette:.4f}, CH Score: {CHScore:.4f}")
+
+    print(f"\nBest Params: K={best_params} with Silhouette={best_silhouette:.4f}, CHScore={best_CH:.4f} ")
     
     if best_df is not None:
+        utils.compute_cluster_statistics(best_df)
         best_df["clusterStr"] = best_df["cluster"].astype(str)
+
         best_num_df = best_df.select_dtypes(include=["number"])
         print(best_num_df.columns)
         fig = px.scatter_matrix(
@@ -76,12 +74,15 @@ def grid_search(datafile, kvalues):
         fig.show()
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
+    if len(sys.argv) < 2:
         print("Usage: python3 kmeansGridSearch.py <Filename>")
         sys.exit(1)
 
     datafile = sys.argv[1]
+    method = sys.argv[2]
+
+
 
     kvalues = list(range(2, 10))
 
-    grid_search(datafile, kvalues)
+    grid_search(datafile, kvalues, method)

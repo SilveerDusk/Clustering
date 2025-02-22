@@ -55,10 +55,12 @@ def dbscan(X, eps, min_pts):
         else:
             labels[point_idx] = -1  # Noise
 
-    silhouette = compute_silhouette_score(X.to_numpy(), np.array(labels))
     X["cluster"] = labels
 
-    return silhouette, X
+    if len(set(X["cluster"])) < 2:
+        return None
+
+    return X
 
 def main():
     if len(sys.argv) != 4:

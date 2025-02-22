@@ -8,26 +8,15 @@ import copy
 from pprint import pprint
 
 
-def main():
-    if len(sys.argv) < 2 or len(sys.argv) > 3:
-        print("Usage: python3 hlclustering <Filename> [<threshold>]")
-        sys.exit(1)
-
-    datafile = sys.argv[1]
-    if len(sys.argv) == 3:
-        threshold = float(sys.argv[2])
-    else:
-        threshold = None
-    df = pd.read_csv(datafile)
-    df = df.select_dtypes(include=["number"])
+def hierarchicalClustering(df, threshold, linkage):
     clusters = initialize_clusters(df)
     merge_history = []
     cluster_indices = list(range(len(clusters)))
-    threshold_clusters = None  # Store clusters when threshold is hit
+    threshold_clusters = None 
  
 
     while len(clusters) > 1:
-        dist_matrix = compute_distances(clusters, linkage_type="complete")
+        dist_matrix = compute_distances(clusters, linkage_type=linkage)
         i, j = find_closest_clusters(distance_matrix=dist_matrix)
 
         # get merge distance
@@ -52,8 +41,13 @@ def main():
     merge_history = np.array(merge_history)
     plot_dendrogram(merge_history, df.shape[0])
     final_clusters = threshold_clusters if threshold_clusters is not None else clusters
-    pprint(final_clusters, width=100)
-    utils.compute_cluster_statistics(final_clusters)
+    df["cluster"] = None
+    for cluster_number, cluster in enumerate(final_clusters):
+        for point in cluster:
+            index = np.where((df.iloc[:, :-1] == point).all(axis=1))[0]
+            if len(index) > 0:
+                df.loc[index[0], 'cluster'] = cluster_number
+    utils.compute_cluster_statistics(df)
     return final_clusters
 
 
@@ -124,6 +118,20 @@ def plot_dendrogram(merge_history, num_points):
     plt.ylabel("Distance")
     plt.savefig("dendrogramScratch.png")
 
+
+def main():
+    if len(sys.argv) < 2 or len(sys.argv) > 3:
+        print("Usage: python3 hlclustering <Filename> [<threshold>]")
+        sys.exit(1)
+
+    datafile = sys.argv[1]
+    if len(sys.argv) == 3:
+        threshold = float(sys.argv[2])
+    else:
+        threshold = None
+    df = pd.read_csv(datafile)
+    df = df.select_dtypes(include=["number"])
+    hierarchicalClustering(df, threshold, linkage="centroid")
 
 if __name__ == "__main__":
     main()

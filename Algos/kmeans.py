@@ -144,18 +144,9 @@ def kmeans(X, k):
   X["cluster"] = labels
 
   if len(set(X["cluster"])) < 2:
-    return 0, 0 ,0, X
+    return None
   
-  silhouette = compute_silhouette_score(X.to_numpy(), X["cluster"].to_numpy())
-  CHScore = calinski_harabasz_score(X, X["cluster"])
-
-  # Normalize both metrics
-  silhouette_norm = normalize(silhouette, MIN_SIL, MAX_SIL)
-  CHScore_norm = normalize(CHScore, MIN_CH, MAX_CH)
-
-  # Compute the balanced avgScore
-  avgScore = silhouette
-  return avgScore, silhouette, CHScore, X
+  return X
 
 def main():
   if len(sys.argv) != 3:

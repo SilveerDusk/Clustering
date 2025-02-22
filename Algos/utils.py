@@ -48,65 +48,79 @@ def fetchDataset(filename):
 
 
 
-def compute_cluster_statistics(clusters, ground_truth=None):
-    print("\nCluster Statistics:")
+
+def compute_cluster_statistics(df, cluster_col='cluster', ground_truth=None, printIt=True):
+    feature_cols = [col for col in df.columns if col != cluster_col]
+    data_points = df[feature_cols].values
+    cluster_labels = df[cluster_col].values
+    unique_clusters = np.unique(cluster_labels[~pd.isna(cluster_labels)]) 
     
-    # Variables to compute overall clustering metrics
     cluster_radii = []
     intercluster_distances = []
-    all_points = []
+    cluster_centroids = {}
     
-    for i, cluster in enumerate(clusters):
-        num_points = len(cluster)
-        centroid = np.mean(cluster, axis=0)
-        distances = np.linalg.norm(cluster - centroid, axis=1)
-
+    for cluster in unique_clusters:
+        cluster_points = df[df[cluster_col] == cluster][feature_cols].values
+        num_points = len(cluster_points)
+        
+        if num_points == 0:
+            continue
+        
+        centroid = np.mean(cluster_points, axis=0)
+        distances = np.linalg.norm(cluster_points - centroid, axis=1)
+        
         min_dist = np.min(distances)
         max_dist = np.max(distances)
         avg_dist = np.mean(distances)
         sse = np.sum(distances ** 2)
-        cluster_radius = max_dist  # Cluster radius is the max distance from centroid
+        cluster_radius = max_dist
         
         cluster_radii.append(cluster_radius)
-        all_points.extend(cluster)
+        cluster_centroids[cluster] = centroid
         
-        print(f"\nCluster {i + 1}:")
-        print(f"  Number of Points: {num_points}")
-        print(f"  Centroid: {centroid}")
-        print(f"  Min Distance to Centroid: {min_dist:.4f}")
-        print(f"  Max Distance to Centroid: {max_dist:.4f}")
-        print(f"  Average Distance to Centroid: {avg_dist:.4f}")
-        print(f"  Sum of Squared Errors (SSE): {sse:.4f}")
-        print(f"  Cluster Radius: {cluster_radius:.4f}")
-
-    # Calculate inter-cluster distances
-    for i in range(len(clusters)):
-        for j in range(i + 1, len(clusters)):
-            # Compute the distance between centroids of cluster i and cluster j
-            centroid_i = np.mean(clusters[i], axis=0)
-            centroid_j = np.mean(clusters[j], axis=0)
+        if printIt:
+            print(f"\nCluster {cluster}:")
+            print(f"  Number of Points: {num_points}")
+            print(f"  Centroid: {centroid}")
+            print(f"  Min Distance to Centroid: {min_dist:.4f}")
+            print(f"  Max Distance to Centroid: {max_dist:.4f}")
+            print(f"  Average Distance to Centroid: {avg_dist:.4f}")
+            print(f"  Sum of Squared Errors (SSE): {sse:.4f}")
+            print(f"  Cluster Radius: {cluster_radius:.4f}")
+    
+    for i, cluster_i in enumerate(unique_clusters):
+        for j, cluster_j in enumerate(unique_clusters):
+            if i >= j:
+                continue
+            
+            centroid_i = cluster_centroids[cluster_i]
+            centroid_j = cluster_centroids[cluster_j]
             dist = np.linalg.norm(centroid_i - centroid_j)
             intercluster_distances.append(dist)
-
-    # Compute overall clustering metrics
-    avg_intercluster_distance = np.mean(intercluster_distances)
-    radius_to_intercluster_ratio = np.mean(np.array(cluster_radii) / np.array(intercluster_distances))
-
-    print("\nOverall Clustering Statistics:")
-    print(f"  Average Inter-cluster Distance: {avg_intercluster_distance:.4f}")
-    print(f"  Average Ratio of Cluster Radii to Intercluster Distances: {radius_to_intercluster_ratio:.4f}")
-
-    # Silhouette Score for all clusters
-    silhouette_avg = silhouette_score(np.array(all_points), np.array([i for i, cluster in enumerate(clusters) for _ in cluster]))
-    print(f"  Silhouette Score of Clustering: {silhouette_avg:.4f}")
-
-    # Calinski-Harabasz Index
-    calinski_harabasz_index = calinski_harabasz_score(np.array(all_points), np.array([i for i, cluster in enumerate(clusters) for _ in cluster]))
-    print(f"  Calinski-Harabasz Index: {calinski_harabasz_index:.4f}")
     
-    # Rand Index if ground truth labels are available
+    avg_intercluster_distance = np.mean(intercluster_distances) if intercluster_distances else np.nan
+    radius_to_intercluster_ratio = np.mean(np.array(cluster_radii)) / np.mean(np.array(intercluster_distances))
+    
+    if printIt:
+        print("\nOverall Clustering Statistics:")
+        print(f"  Average Inter-cluster Distance: {avg_intercluster_distance:.4f}")
+        print(f"  Average Ratio of Cluster Radii to Intercluster Distances: {radius_to_intercluster_ratio:.4f}")
+    
+    silhouette_avg = None
+    if len(unique_clusters) > 1:
+        silhouette_avg = silhouette_score(data_points, cluster_labels)
+        if printIt:
+            print(f"  Silhouette Score of Clustering: {silhouette_avg:.4f}")
+    
+    calinski_harabasz_index = calinski_harabasz_score(data_points, cluster_labels)
+    if printIt:
+        print(f"  Calinski-Harabasz Index: {calinski_harabasz_index:.4f}")
+    
+    rand_index = None
     if ground_truth is not None:
         ground_truth_labels = np.array(ground_truth)
-        predicted_labels = np.array([i for i, cluster in enumerate(clusters) for _ in cluster])
-        rand_index = rand_score(ground_truth_labels, predicted_labels)
-        print(f"  Rand Index: {rand_index:.4f}")
+        rand_index = rand_score(ground_truth_labels, cluster_labels)
+        if printIt:
+            print(f"  Rand Index: {rand_index:.4f}")
+    
+    return silhouette_avg, calinski_harabasz_index, rand_index
