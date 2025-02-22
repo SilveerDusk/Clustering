@@ -1,8 +1,9 @@
+import utils
 import sys
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from scipy.cluster.hierarchy import dendrogram, linkage
+from scipy.cluster.hierarchy import dendrogram
 import copy
 from pprint import pprint
 
@@ -52,6 +53,7 @@ def main():
     plot_dendrogram(merge_history, df.shape[0])
     final_clusters = threshold_clusters if threshold_clusters is not None else clusters
     pprint(final_clusters, width=100)
+    utils.compute_cluster_statistics(final_clusters)
     return final_clusters
 
 
