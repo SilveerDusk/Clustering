@@ -24,12 +24,28 @@ def cosine_similarity(x1, x2):
   return np.dot(x1, x2) / (np.sqrt(np.dot(x1, x1)) * np.sqrt(np.dot(x2, x2)))
 
 def initialize_centroids(X, k):
-  n_samples, n_features = X.shape
-  centroids = np.zeros((k, n_features))
-  for i in range(k):
-    centroid =  X.iloc[np.random.choice(range(n_samples))]
-    centroids[i] = centroid
-  return centroids
+    n_samples, n_features = X.shape
+    centroids = np.zeros((k, n_features))
+    
+    # Select the first centroid randomly
+    centroids[0] = X.iloc[np.random.choice(range(n_samples))]
+    
+    for i in range(1, k):
+        # Compute the distance from each point to the nearest centroid
+        def getFurtherstPoint(X, centroids):
+          furthestPoint = 0
+          for index, x in X.iterrows():
+            distances = []
+            for centroid in centroids:
+              distances.append(euclidean_distance(x, centroid))
+            distances = sum(distances)
+            if distances > furthestPoint:
+              furthestPoint = distances
+          return index
+    
+        centroids[i] = X.iloc[getFurtherstPoint(X, centroids)]
+    
+    return centroids
 
 def closest_centroid(sample, centroids, metric):
   closest_i = None
@@ -126,6 +142,10 @@ def kmeans(X, k):
       labels[sample_i] = i
 
   X["cluster"] = labels
+
+  if len(set(X["cluster"])) < 2:
+    return 0, 0 ,0, X
+  
   silhouette = compute_silhouette_score(X.to_numpy(), X["cluster"].to_numpy())
   CHScore = calinski_harabasz_score(X, X["cluster"])
 
@@ -134,7 +154,7 @@ def kmeans(X, k):
   CHScore_norm = normalize(CHScore, MIN_CH, MAX_CH)
 
   # Compute the balanced avgScore
-  avgScore = (silhouette_norm + CHScore_norm) / 2
+  avgScore = silhouette
   return avgScore, silhouette, CHScore, X
 
 def main():
