@@ -6,14 +6,21 @@ import matplotlib.pyplot as plt
 from scipy.cluster.hierarchy import dendrogram
 import copy
 from pprint import pprint
+import plotly.express as px
 
 
-def hierarchicalClustering(df, threshold, linkage):
+def hierarchicalClustering(df, threshold, linkage, datafile):
     clusters = initialize_clusters(df)
     merge_history = []
     cluster_indices = list(range(len(clusters)))
     threshold_clusters = None 
- 
+    num_df = pd.read_csv(datafile)
+    if datafile == "datasets/iris.csv":
+        ground_truth = num_df.iloc[:, -1]
+    else:
+        ground_truth = None
+    num_df = num_df.select_dtypes(include=["number"])
+
 
     while len(clusters) > 1:
         dist_matrix = compute_distances(clusters, linkage_type=linkage)
@@ -42,12 +49,27 @@ def hierarchicalClustering(df, threshold, linkage):
     plot_dendrogram(merge_history, df.shape[0])
     final_clusters = threshold_clusters if threshold_clusters is not None else clusters
     df["cluster"] = None
+    print("Finalized Clusters\n")
+    print(final_clusters)
     for cluster_number, cluster in enumerate(final_clusters):
         for point in cluster:
             index = np.where((df.iloc[:, :-1] == point).all(axis=1))[0]
             if len(index) > 0:
-                df.loc[index[0], 'cluster'] = cluster_number
-    utils.compute_cluster_statistics(df)
+                df.loc[index, 'cluster'] = cluster_number  # Assign to all occurrences
+
+    silhouette, CHscore, Rand = utils.compute_cluster_statistics(df, ground_truth=ground_truth)
+    df["clusterStr"] = df["cluster"].astype(str)
+    fig = px.scatter_matrix(
+        df,
+        dimensions=num_df.columns, 
+        color = "clusterStr",
+        title = f"Agglomerative Clustering using data: {datafile}, threshold: {threshold}, Silhouette Score: {silhouette}, CHscore: {CHscore}",
+        labels={"clusterStr": "Cluster"},
+        opacity=0.8,
+        hover_data=df.columns
+    )
+    fig.show()
+
     return final_clusters
 
 
@@ -131,7 +153,7 @@ def main():
         threshold = None
     df = pd.read_csv(datafile)
     df = df.select_dtypes(include=["number"])
-    hierarchicalClustering(df, threshold, linkage="centroid")
+    hierarchicalClustering(df, threshold, linkage="centroid", datafile=datafile)
 
 if __name__ == "__main__":
     main()

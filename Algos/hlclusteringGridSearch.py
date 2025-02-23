@@ -24,7 +24,6 @@ def hlclustering_and_evaluate(df, n_clusters=None, threshold=None):
     return num_df
 
 def generate_dendrogram(df, filename="dendrogram.png"):
-    """Generates and saves the dendrogram of the hierarchical clustering."""
     num_df = df.select_dtypes(include=["number"])
     
     linkage_matrix = sch.linkage(num_df, method="single", metric="euclidean")
@@ -56,17 +55,17 @@ def grid_search(datafile, thresholds, n_clusters):
                 silhouette, CHScore, Rand = utils.compute_cluster_statistics(clustered_df, printIt=False)
 
                 num_clusters_found = clustered_df["cluster"].nunique()
-                
-                if silhouette > best_score and silhouette != 1.0 and num_clusters == num_clusters_found:
+
+                if silhouette > best_score and num_clusters == num_clusters_found:
                     best_score = silhouette
                     best_silhouette = silhouette
                     best_CHScore = CHScore
                     best_params = (threshold, num_clusters)
                     best_df = clustered_df
 
-            print(f"Threshold: {threshold}, n_clusters: {num_clusters}, Silhouette: {silhouette:.4f}")
+                print(f"Threshold: {threshold}, n_clusters: {num_clusters}, Silhouette: {silhouette:.4f}")
 
-    print(f"\nBest Params: Threshold={best_params[0]} and n_clusters: {best_params[1]} with Silhouette={best_silhouette:.4f} and CHScore={best_CHScore:.4f}")
+    print(f"\nBest Params: Threshold={best_params[0]} and n_clusters: {best_params[1]} with Silhouette={best_silhouette:.4f} and CHScore={best_CHScore}")
     
     if best_df is not None:
         generate_dendrogram(best_df)
@@ -79,7 +78,7 @@ def grid_search(datafile, thresholds, n_clusters):
             best_df,
             dimensions=best_num_df.columns[:(len(best_num_df.columns)-1)], 
             color = "clusterStr",
-            title=f"Best HL Clustering for data: {datafile}, Threshold={best_params[0]}, n_clusters: {best_params[1]}, Score={best_score:.4f}",
+            title=f"Best HL Clustering for data: {datafile}, Threshold={best_params[0]}, n_clusters: {best_params[1]}, Score={best_score}",
             labels={"clusterStr": "Cluster"},
             opacity=0.8,
             hover_data=best_df.columns
@@ -93,7 +92,7 @@ if __name__ == "__main__":
 
     datafile = sys.argv[1]
 
-    thresholds = np.arange(4, 15, 0.5).tolist()
-    n_clusters = list(range(2, 5))
+    thresholds = np.arange(0.1, 2, .1).tolist()
+    n_clusters = list(range(2, 6))
 
     grid_search(datafile,thresholds=thresholds, n_clusters= n_clusters)
