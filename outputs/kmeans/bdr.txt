@@ -1,0 +1,30 @@
+K: 2, Silhouette: 0.6346, CH Score: 171.8998
+K: 3, Silhouette: 0.6344, CH Score: 147.8774
+K: 4, Silhouette: 0.4427, CH Score: 132.2275
+
+Best Params: K=2 with Silhouette=0.6346, CHScore=171.8998 
+
+Cluster 0.0:
+  Number of Points: 41
+  Centroid: [20.26097561  9.10731707]
+  Min Distance to Centroid: 0.7091
+  Max Distance to Centroid: 11.0188
+  Average Distance to Centroid: 4.0350
+  Sum of Squared Errors (SSE): 883.4054
+  Cluster Radius: 11.0188
+
+Cluster 1.0:
+  Number of Points: 29
+  Centroid: [41.57241379 12.08965517]
+  Min Distance to Centroid: 1.9937
+  Max Distance to Centroid: 25.5438
+  Average Distance to Centroid: 7.2826
+  Sum of Squared Errors (SSE): 2228.0648
+  Cluster Radius: 25.5438
+
+Overall Clustering Statistics:
+  Average Inter-cluster Distance: 21.5191
+  Average Ratio of Cluster Radii to Intercluster Distances: 0.8495
+  Silhouette Score of Clustering: 0.6346
+  Calinski-Harabasz Index: 171.8998
+Index(['1', '1.1', 'cluster'], dtype='object')

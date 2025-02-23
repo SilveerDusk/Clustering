@@ -1,0 +1,71 @@
+K: 2, Silhouette: 0.3694, CH Score: 44.7777
+K: 3, Silhouette: 0.4852, CH Score: 77.7743
+K: 4, Silhouette: 0.4602, CH Score: 93.7415
+K: 5, Silhouette: 0.5013, CH Score: 104.1947
+K: 6, Silhouette: 0.5527, CH Score: 133.6648
+K: 7, Silhouette: 0.5022, CH Score: 124.4314
+K: 8, Silhouette: 0.5179, CH Score: 127.7966
+K: 9, Silhouette: 0.4491, CH Score: 121.2646
+
+Best Params: K=6 with Silhouette=0.5527, CHScore=133.6648 
+
+Cluster 0.0:
+  Number of Points: 10
+  Centroid: [23.3 41.7]
+  Min Distance to Centroid: 0.4243
+  Max Distance to Centroid: 9.1093
+  Average Distance to Centroid: 4.0059
+  Sum of Squared Errors (SSE): 228.2000
+  Cluster Radius: 9.1093
+
+Cluster 1.0:
+  Number of Points: 14
+  Centroid: [11.35714286  8.        ]
+  Min Distance to Centroid: 1.0619
+  Max Distance to Centroid: 10.8621
+  Average Distance to Centroid: 4.9727
+  Sum of Squared Errors (SSE): 467.2143
+  Cluster Radius: 10.8621
+
+Cluster 2.0:
+  Number of Points: 14
+  Centroid: [34.  24.5]
+  Min Distance to Centroid: 1.1180
+  Max Distance to Centroid: 12.2984
+  Average Distance to Centroid: 5.3215
+  Sum of Squared Errors (SSE): 499.5000
+  Cluster Radius: 12.2984
+
+Cluster 3.0:
+  Number of Points: 14
+  Centroid: [ 8.78571429 33.64285714]
+  Min Distance to Centroid: 1.2657
+  Max Distance to Centroid: 11.9715
+  Average Distance to Centroid: 5.0288
+  Sum of Squared Errors (SSE): 495.5714
+  Cluster Radius: 11.9715
+
+Cluster 4.0:
+  Number of Points: 10
+  Centroid: [41.2  9.6]
+  Min Distance to Centroid: 2.6077
+  Max Distance to Centroid: 15.6589
+  Average Distance to Centroid: 6.2509
+  Sum of Squared Errors (SSE): 572.0000
+  Cluster Radius: 15.6589
+
+Cluster 5.0:
+  Number of Points: 11
+  Centroid: [41.27272727 38.90909091]
+  Min Distance to Centroid: 1.6763
+  Max Distance to Centroid: 10.0856
+  Average Distance to Centroid: 4.3968
+  Sum of Squared Errors (SSE): 277.0909
+  Cluster Radius: 10.0856
+
+Overall Clustering Statistics:
+  Average Inter-cluster Distance: 27.7553
+  Average Ratio of Cluster Radii to Intercluster Distances: 0.4203
+  Silhouette Score of Clustering: 0.5527
+  Calinski-Harabasz Index: 133.6648
+Index(['1', '1.1', 'cluster'], dtype='object')
