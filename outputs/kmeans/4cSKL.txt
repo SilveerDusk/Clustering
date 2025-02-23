@@ -1,0 +1,44 @@
+K: 2, Silhouette: 0.5113, CH Score: 39.6228
+K: 3, Silhouette: 0.6710, CH Score: 109.6798
+K: 4, Silhouette: 0.5699, CH Score: 107.9662
+K: 5, Silhouette: 0.6069, CH Score: 115.6965
+K: 6, Silhouette: 0.5573, CH Score: 128.7650
+K: 7, Silhouette: 0.5800, CH Score: 144.5323
+K: 8, Silhouette: 0.4935, CH Score: 130.4219
+K: 9, Silhouette: 0.4946, CH Score: 115.9782
+
+Best Params: K=3 with Silhouette=0.6710, CHScore=109.6798 
+
+Cluster 0:
+  Number of Points: 18
+  Centroid: [33.16666667 17.27777778]
+  Min Distance to Centroid: 2.2839
+  Max Distance to Centroid: 12.1241
+  Average Distance to Centroid: 7.5795
+  Sum of Squared Errors (SSE): 1164.1111
+  Cluster Radius: 12.1241
+
+Cluster 1:
+  Number of Points: 12
+  Centroid: [11.91666667 37.83333333]
+  Min Distance to Centroid: 0.1863
+  Max Distance to Centroid: 13.0844
+  Average Distance to Centroid: 4.8363
+  Sum of Squared Errors (SSE): 390.5833
+  Cluster Radius: 13.0844
+
+Cluster 2:
+  Number of Points: 9
+  Centroid: [41.11111111 41.77777778]
+  Min Distance to Centroid: 0.7857
+  Max Distance to Centroid: 4.2760
+  Average Distance to Centroid: 2.9117
+  Sum of Squared Errors (SSE): 86.4444
+  Cluster Radius: 4.2760
+
+Overall Clustering Statistics:
+  Average Inter-cluster Distance: 28.2602
+  Average Ratio of Cluster Radii to Intercluster Distances: 0.3478
+  Silhouette Score of Clustering: 0.6710
+  Calinski-Harabasz Index: 109.6798
+Index(['1', '1.1', 'cluster'], dtype='object')
