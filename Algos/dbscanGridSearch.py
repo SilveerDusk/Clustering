@@ -7,9 +7,6 @@ import utils
 import numpy as np
 from dbscan import dbscan
 
-
-
-
 def dbscan_and_evaluate(df, epsilon, numPoints):
     num_df = df.select_dtypes(include=["number"])
     model = DBSCAN(eps=epsilon, min_samples=numPoints)
@@ -21,12 +18,8 @@ def dbscan_and_evaluate(df, epsilon, numPoints):
 
     return df
 
-
-
-
-
 def grid_search(datafile, epsilons, min_samples, method):
-    df = pd.read_csv(datafile)
+    df = utils.fetchDataset(datafile)
     best_score = float("-inf")
     best_params = None
     best_df = None

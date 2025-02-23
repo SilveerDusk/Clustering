@@ -34,16 +34,18 @@ def initialize_centroids(X, k):
         # Compute the distance from each point to the nearest centroid
         def getFurtherstPoint(X, centroids):
           furthestPoint = 0
+          greatestDistance = 0
           for index, x in X.iterrows():
             distances = []
             for centroid in centroids:
               distances.append(euclidean_distance(x, centroid))
-            distances = sum(distances)
-            if distances > furthestPoint:
-              furthestPoint = distances
-          return index
+            distance = sum(distances)/len(distances)
+            if distance > greatestDistance:
+              furthestPoint = index
+              greatestDistance = distance  
+          return furthestPoint
     
-        centroids[i] = X.iloc[getFurtherstPoint(X, centroids)]
+        centroids[i] = X.iloc[getFurtherstPoint(X, centroids[:i])]
     
     return centroids
 
@@ -77,7 +79,7 @@ def calculate_loss(X, clusters, centroids, metric):
   loss = 0.0
   for i, cluster in enumerate(clusters):
       for sample_i in cluster:
-          loss += metric(X.iloc[sample_i].values, centroids[i]) ** 2
+          loss += metric(X.iloc[sample_i].values, centroids[i])
   return loss
 
 def plot_clusters(X, clusters, centroids):
@@ -118,11 +120,6 @@ def kmeans(X, k):
   loss = calculate_loss(X, clusters, new_centroids, euclidean_distance)
   prev_loss = float('inf')
 
-  print("Initial Centroids:\n", centroids)
-  print("Clusters:\n", clusters)
-  print("New Centroids:\n", new_centroids)
-  print("Loss:", loss)
-
   while prev_loss != loss or centroids.any() != new_centroids.any():
     centroids = new_centroids
     prev_loss = loss
@@ -130,10 +127,7 @@ def kmeans(X, k):
     new_centroids = calculate_new_centroids(X, clusters)
     loss = calculate_loss(X, clusters, new_centroids, euclidean_distance)
 
-    print("Loss:", loss)
-
   final_clusters = form_clusters(X, new_centroids, k, euclidean_distance)
-  print("Final Clusters:\n", final_clusters)
 
   labels = np.zeros(X.shape[0])
 
